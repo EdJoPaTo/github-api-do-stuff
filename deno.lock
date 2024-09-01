@@ -3,21 +3,21 @@
   "packages": {
     "specifiers": {
       "jsr:@edjopato/array-filter-unique": "jsr:@edjopato/array-filter-unique@3.1.0",
-      "jsr:@std/fs": "jsr:@std/fs@1.0.1",
-      "jsr:@std/path@^1.0.2": "jsr:@std/path@1.0.2"
+      "jsr:@std/fs": "jsr:@std/fs@1.0.2",
+      "jsr:@std/path@^1.0.3": "jsr:@std/path@1.0.3"
     },
     "jsr": {
       "@edjopato/array-filter-unique@3.1.0": {
         "integrity": "7baa8bde2b531734a14fa33302e8cabf8740d21f1824911b66a96371317078b6"
       },
-      "@std/fs@1.0.1": {
-        "integrity": "d6914ca2c21abe591f733b31dbe6331e446815e513e2451b3b9e472daddfefcb",
+      "@std/fs@1.0.2": {
+        "integrity": "af57555c7a224a6f147d5cced5404692974f7a628ced8eda67e0d22d92d474ec",
         "dependencies": [
-          "jsr:@std/path@^1.0.2"
+          "jsr:@std/path@^1.0.3"
         ]
       },
-      "@std/path@1.0.2": {
-        "integrity": "a452174603f8c620bd278a380c596437a9eef50c891c64b85812f735245d9ec7"
+      "@std/path@1.0.3": {
+        "integrity": "cd89d014ce7eb3742f2147b990f6753ee51d95276bfc211bc50c860c1bc7df6f"
       }
     }
   },
