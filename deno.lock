@@ -3,31 +3,31 @@
   "packages": {
     "specifiers": {
       "jsr:@edjopato/array-filter-unique": "jsr:@edjopato/array-filter-unique@3.1.0",
-      "jsr:@std/fs": "jsr:@std/fs@1.0.1",
-      "jsr:@std/path@^1.0.2": "jsr:@std/path@1.0.2"
+      "jsr:@std/fs": "jsr:@std/fs@1.0.4",
+      "jsr:@std/path@^1.0.6": "jsr:@std/path@1.0.6"
     },
     "jsr": {
       "@edjopato/array-filter-unique@3.1.0": {
         "integrity": "7baa8bde2b531734a14fa33302e8cabf8740d21f1824911b66a96371317078b6"
       },
-      "@std/fs@1.0.1": {
-        "integrity": "d6914ca2c21abe591f733b31dbe6331e446815e513e2451b3b9e472daddfefcb",
+      "@std/fs@1.0.4": {
+        "integrity": "2907d32d8d1d9e540588fd5fe0ec21ee638134bd51df327ad4e443aaef07123c",
         "dependencies": [
-          "jsr:@std/path@^1.0.2"
+          "jsr:@std/path@^1.0.6"
         ]
       },
-      "@std/path@1.0.2": {
-        "integrity": "a452174603f8c620bd278a380c596437a9eef50c891c64b85812f735245d9ec7"
+      "@std/path@1.0.6": {
+        "integrity": "ab2c55f902b380cf28e0eec501b4906e4c1960d13f00e11cfbcd21de15f18fed"
       }
     }
   },
   "redirects": {
     "https://esm.sh/@octokit/core": "https://esm.sh/@octokit/core@6.1.2",
-    "https://esm.sh/@octokit/types": "https://esm.sh/@octokit/types@13.5.0"
+    "https://esm.sh/@octokit/types": "https://esm.sh/@octokit/types@13.6.1"
   },
   "remote": {
     "https://esm.sh/@octokit/core@6.1.2": "263311f52fbd38cdf0aca84be5bb31fbb432998a0b5a33cb5c706f96e077b12a",
-    "https://esm.sh/@octokit/types@13.5.0": "fabf6997a3adf11e45d11e3c4d58d0634ab98f9d72f3116f3694123818ccd457",
+    "https://esm.sh/@octokit/types@13.6.1": "fabf6997a3adf11e45d11e3c4d58d0634ab98f9d72f3116f3694123818ccd457",
     "https://esm.sh/v135/@octokit/auth-token@5.1.0/denonext/auth-token.mjs": "24c22015e586d621821b0acb1b5b82d32c95d1813d264ce8fa3f769ba8806e8c",
     "https://esm.sh/v135/@octokit/auth-token@5.1.1/denonext/auth-token.mjs": "afc5eb8208138b4b8aaac800b1f489e3274b593a33398967fa2f2af6cf22202f",
     "https://esm.sh/v135/@octokit/core@6.1.2/denonext/core.mjs": "2629f0f304f0a8313644ed4ddedbf1c7fbce06e80aadc6f718f6a4b4f401f9d7",
