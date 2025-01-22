@@ -108,11 +108,6 @@ async function updateRulesets(
 			conditions: { ref_name: { include: ["refs/tags/v*.*.*"], exclude: [] } },
 			bypass_actors: [
 				{
-					actor_id: 1,
-					actor_type: "OrganizationAdmin",
-					bypass_mode: "always",
-				},
-				{
 					actor_id: 5, // Repository Admin
 					actor_type: "RepositoryRole",
 					bypass_mode: "always",
@@ -148,11 +143,6 @@ async function updateRulesets(
 			enforcement: "active",
 			conditions: { ref_name: { exclude: [], include: ["~DEFAULT_BRANCH"] } },
 			bypass_actors: [
-				{
-					actor_id: 1,
-					actor_type: "OrganizationAdmin",
-					bypass_mode: "always",
-				},
 				{
 					actor_id: 5, // Repository Admin
 					actor_type: "RepositoryRole",
