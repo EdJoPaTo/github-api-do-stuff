@@ -8,7 +8,7 @@ import { exec, HOME } from "./lib/local.ts";
 
 const COMMANDS: Readonly<Record<string, string>> = {
 	"Cargo.lock":
-		"CARGO_RESOLVER_INCOMPATIBLE_RUST_VERSIONS=fallback cargo +nightly -Zmsrv-policy update --quiet",
+		"CARGO_RESOLVER_INCOMPATIBLE_RUST_VERSIONS=fallback cargo update --quiet",
 	"deno.lock":
 		"rm -f deno.lock && fd --extension ts --exec-batch deno cache --reload",
 	"package-lock.json":
