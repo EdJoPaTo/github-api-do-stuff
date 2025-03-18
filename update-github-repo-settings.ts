@@ -27,7 +27,6 @@ const WANTED_CHECKS = [
 	"node.js",
 	"publish-dry-run",
 	"release",
-	"run with example config", // website-stalker
 	"rustfmt",
 	"test",
 ] as const satisfies string[];
