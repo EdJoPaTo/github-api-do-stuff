@@ -229,10 +229,20 @@ async function doRepo(
 			default_workflow_permissions: "read",
 		},
 	);
+
 	if (privateRepo) {
 		await octokit.request(
 			"PUT /repos/{owner}/{repo}/actions/permissions/access",
 			{ owner, repo, access_level: "none" },
+		);
+	} else {
+		await octokit.request(
+			"PUT /repos/{owner}/{repo}/actions/permissions/fork-pr-contributor-approval",
+			{
+				owner,
+				repo,
+				approval_policy: "first_time_contributors_new_to_github",
+			},
 		);
 	}
 
