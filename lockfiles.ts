@@ -90,11 +90,9 @@ async function updateLockfiles(dir: string) {
 	}
 }
 
-const repos = await searchGithubRepos([
-	"fork:true",
-	"archived:false",
-	...MY_REPOS_SEARCH_PARAMS,
-].join(" "));
+const repos = await searchGithubRepos(
+	["fork:true", "archived:false", ...MY_REPOS_SEARCH_PARAMS].join(" "),
+);
 console.log("total repos", repos.length);
 for (const repoInfo of repos) {
 	const owner = repoInfo.owner!.login;
@@ -121,8 +119,10 @@ for (const repoInfo of repos) {
 	console.log();
 	console.log(owner, repo);
 
-	const prefix = `github-api-lockfile-${repoInfo.full_name}-`
-		.replaceAll(/[^a-zA-Z0-9]+/g, "-");
+	const prefix = `github-api-lockfile-${repoInfo.full_name}-`.replaceAll(
+		/[^a-zA-Z0-9]+/g,
+		"-",
+	);
 	const tmpdir = await Deno.makeTempDir({ prefix });
 
 	try {

@@ -9,14 +9,16 @@ async function doRepo(owner: string, repo: string) {
 	console.log("\ndo repo", owner, repo);
 
 	const [workflowsResponse, runsReponse] = await Promise.all([
-		octokit.request(
-			"GET /repos/{owner}/{repo}/actions/workflows",
-			{ owner, repo, per_page: 100 },
-		),
-		octokit.request(
-			"GET /repos/{owner}/{repo}/actions/runs",
-			{ owner, repo, per_page: 100 },
-		),
+		octokit.request("GET /repos/{owner}/{repo}/actions/workflows", {
+			owner,
+			repo,
+			per_page: 100,
+		}),
+		octokit.request("GET /repos/{owner}/{repo}/actions/runs", {
+			owner,
+			repo,
+			per_page: 100,
+		}),
 	]);
 
 	const { workflows } = workflowsResponse.data;
@@ -43,11 +45,9 @@ async function doRepo(owner: string, repo: string) {
 	logNonEmptyArray("not completed workflow runs", nonFinished);
 }
 
-const repos = await searchGithubRepos([
-	"fork:true",
-	"archived:false",
-	...MY_REPOS_SEARCH_PARAMS,
-].join(" "));
+const repos = await searchGithubRepos(
+	["fork:true", "archived:false", ...MY_REPOS_SEARCH_PARAMS].join(" "),
+);
 console.log("total repos", repos.length);
 
 logNonEmptyArray(
@@ -59,9 +59,7 @@ logNonEmptyArray(
 
 logNonEmptyArray(
 	"has projects",
-	repos
-		.filter((o) => o.has_projects)
-		.map((o) => `${o.html_url}`),
+	repos.filter((o) => o.has_projects).map((o) => o.html_url),
 );
 
 for (const repo of repos) {

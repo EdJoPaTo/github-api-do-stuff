@@ -11,8 +11,9 @@ function isCheckWanted(name: string): boolean {
 	if (lower.includes("beta") || lower.includes("nightly")) {
 		return false;
 	}
-	return WANTED_CHECKS
-		.some((wanted) => lower === wanted || lower.startsWith(wanted + " "));
+	return WANTED_CHECKS.some(
+		(wanted) => lower === wanted || lower.startsWith(wanted + " "),
+	);
 }
 
 // Do not add website-stalker. The git push doesnt work anymore then
@@ -63,10 +64,11 @@ async function updateRulesets(
 		target: "branch" | "tag",
 		name: string,
 	): Promise<number> {
-		let id = rulesetsResponse.data.find((rule) =>
-			rule.source_type === "Repository" &&
-			rule.target === target &&
-			rule.name === name
+		let id = rulesetsResponse.data.find(
+			(rule) =>
+				rule.source_type === "Repository" &&
+				rule.target === target &&
+				rule.name === name,
 		)?.id;
 		if (!id) {
 			const bla = await octokit.request("POST /repos/{owner}/{repo}/rulesets", {
@@ -185,10 +187,11 @@ async function doRepo(
 	await Promise.all([
 		removeBranchProtections(owner, repo),
 
-		octokit.request(
-			"PUT /repos/{owner}/{repo}/subscription",
-			{ owner, repo, subscribed: true },
-		),
+		octokit.request("PUT /repos/{owner}/{repo}/subscription", {
+			owner,
+			repo,
+			subscribed: true,
+		}),
 
 		octokit.request("PATCH /repos/{owner}/{repo}", {
 			owner,
@@ -209,10 +212,12 @@ async function doRepo(
 			},
 		}),
 
-		octokit.request(
-			"PUT /repos/{owner}/{repo}/actions/permissions",
-			{ owner, repo, enabled: true, allowed_actions: "all" },
-		),
+		octokit.request("PUT /repos/{owner}/{repo}/actions/permissions", {
+			owner,
+			repo,
+			enabled: true,
+			allowed_actions: "all",
+		}),
 	]);
 
 	await octokit.request(
@@ -245,8 +250,9 @@ async function doRepo(
 		.map((check) => ({ appId: check.app?.id, name: check.name }))
 		.filter(arrayFilterUnique((check) => `${check.appId} ${check.name}`))
 		.sort((a, b) => a.name.localeCompare(b.name));
-	const ghaPushesToDefault = allChecks
-		.some((check) => check.name === "website-stalker");
+	const ghaPushesToDefault = allChecks.some(
+		(check) => check.name === "website-stalker",
+	);
 	const relevantChecks = allChecks.filter((check) => isCheckWanted(check.name));
 	// logNonEmptyArray("relevant checks", relevantChecks);
 
@@ -268,11 +274,9 @@ async function doRepo(
 	return allChecks.map((check) => check.name);
 }
 
-const repos = await searchGithubRepos([
-	"fork:true",
-	"archived:false",
-	...MY_REPOS_SEARCH_PARAMS,
-].join(" "));
+const repos = await searchGithubRepos(
+	["fork:true", "archived:false", ...MY_REPOS_SEARCH_PARAMS].join(" "),
+);
 console.log("total repos", repos.length);
 
 let allChecks: string[] = [];
@@ -290,8 +294,8 @@ console.log("\n\nall done");
 allChecks = allChecks
 	.filter(arrayFilterUnique())
 	.sort((a, b) => a.localeCompare(b));
-const unusedWantedChecks = [...WANTED_CHECKS].filter((wanted) =>
-	!allChecks.some((check) => check.toLowerCase().includes(wanted))
+const unusedWantedChecks = [...WANTED_CHECKS].filter(
+	(wanted) => !allChecks.some((check) => check.toLowerCase().includes(wanted)),
 );
 const wantedChecks = allChecks.filter((o) => isCheckWanted(o));
 const ignoredChecks = allChecks.filter((o) => !isCheckWanted(o));

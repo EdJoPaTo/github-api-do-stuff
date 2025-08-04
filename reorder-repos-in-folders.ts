@@ -15,17 +15,15 @@ import {
 
 const [localRepos, remoteRepos] = await Promise.all([
 	getLocalRepos(),
-	searchGithubRepos([
-		"fork:true",
-		...MY_REPOS_SEARCH_PARAMS,
-	].join(" ")),
+	searchGithubRepos(["fork:true", ...MY_REPOS_SEARCH_PARAMS].join(" ")),
 ]);
 
 async function getExpectedDirectory(localRepo: LocalRepo): Promise<string> {
 	if (localRepo.host === "github.com") {
 		const { remoteUrl } = localRepo;
-		const remoteRepoInfo = remoteRepos
-			.find((r) => remoteUrl === r.ssh_url || remoteUrl === r.clone_url);
+		const remoteRepoInfo = remoteRepos.find(
+			(r) => remoteUrl === r.ssh_url || remoteUrl === r.clone_url,
+		);
 		if (remoteRepoInfo) {
 			return getExpectedDirectoryOfGitHubRepo(remoteRepoInfo);
 		} else {
@@ -38,10 +36,7 @@ async function getExpectedDirectory(localRepo: LocalRepo): Promise<string> {
 			);
 
 			if (remoteUrl !== repoInfo.ssh_url) {
-				console.log(
-					"not in search result, remote is",
-					repoInfo.ssh_url,
-				);
+				console.log("not in search result, remote is", repoInfo.ssh_url);
 			}
 
 			return getExpectedDirectoryOfGitHubRepo(repoInfo);

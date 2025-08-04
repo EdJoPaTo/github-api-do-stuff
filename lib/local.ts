@@ -101,11 +101,7 @@ export async function getLocalRepos(): Promise<LocalRepo[]> {
 			const url = remoteMatch[2]!;
 			const info = matchRemote(url);
 			if (!info) {
-				console.log(
-					"skip not parsable",
-					dir.replace(HOME, "~"),
-					remoteLine,
-				);
+				console.log("skip not parsable", dir.replace(HOME, "~"), remoteLine);
 				continue;
 			}
 
