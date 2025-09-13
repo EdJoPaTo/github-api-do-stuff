@@ -1,4 +1,4 @@
-import { existsSync } from "jsr:@std/fs";
+import { existsSync } from "jsr:@std/fs@1";
 import {
 	MY_REPOS_SEARCH_PARAMS,
 	octokit,

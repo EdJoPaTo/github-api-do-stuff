@@ -1,4 +1,4 @@
-import { arrayFilterUnique } from "jsr:@edjopato/array-filter-unique";
+import { arrayFilterUnique } from "jsr:@edjopato/array-filter-unique@3";
 import {
 	MY_REPOS_SEARCH_PARAMS,
 	octokit,
