@@ -1,4 +1,4 @@
-import { existsSync } from "jsr:@std/fs@1";
+import { existsSync } from "node:fs";
 import {
 	MY_REPOS_SEARCH_PARAMS,
 	octokit,
@@ -44,7 +44,7 @@ async function updateLockfiles(dir: string) {
 	}
 
 	for (const [lockfile, command] of Object.entries(COMMANDS)) {
-		if (!existsSync(dir + "/" + lockfile, { isFile: true })) {
+		if (!existsSync(dir + "/" + lockfile)) {
 			continue;
 		}
 

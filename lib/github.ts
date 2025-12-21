@@ -1,5 +1,5 @@
-import { Octokit } from "npm:@octokit/core@7";
-import type { Endpoints } from "npm:@octokit/types@14";
+import { Octokit } from "@octokit/core";
+import type { Endpoints } from "@octokit/types";
 
 export const MY_REPOS_SEARCH_PARAMS = [
 	"repo:grammyjs/stateless-question",

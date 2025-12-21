@@ -24,8 +24,12 @@
 				"no-slow-types",
 				"no-sparse-arrays",
 				"verbatim-module-syntax"
-			],
-			"exclude": ["no-import-prefix"]
+			]
 		}
+	},
+	"imports": {
+		"@octokit/core": "npm:@octokit/core@^7",
+		"@octokit/types": "npm:@octokit/types@^16",
+		"array-filter-unique": "jsr:@edjopato/array-filter-unique@^3"
 	}
 }
