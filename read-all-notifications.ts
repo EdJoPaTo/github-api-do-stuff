@@ -1,3 +1,5 @@
+#!/usr/bin/env -S deno run --allow-net=api.github.com --allow-env=GITHUB_PAT
+
 import { octokit } from "./lib/github.ts";
 
 const SECOND = 1000;

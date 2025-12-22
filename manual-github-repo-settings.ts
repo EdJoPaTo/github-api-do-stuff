@@ -1,3 +1,5 @@
+#!/usr/bin/env -S deno run --allow-net=api.github.com --allow-env=GITHUB_PAT
+
 import {
 	MY_REPOS_SEARCH_PARAMS,
 	octokit,

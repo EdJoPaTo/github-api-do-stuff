@@ -1,3 +1,5 @@
+#!/usr/bin/env -S deno run --allow-net=api.github.com --allow-env=GITHUB_PAT,HOME --allow-read=${HOME}/git --allow-run=git
+
 import { MY_REPOS_SEARCH_PARAMS, searchGithubRepos } from "./lib/github.ts";
 import { exec, getExpectedDirectoryOfGitHubRepo, HOME } from "./lib/local.ts";
 

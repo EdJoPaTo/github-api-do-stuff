@@ -1,3 +1,5 @@
+#!/usr/bin/env -S deno run --allow-net=api.github.com --allow-env=GITHUB_PAT
+
 import { arrayFilterUnique } from "array-filter-unique";
 import {
 	MY_REPOS_SEARCH_PARAMS,

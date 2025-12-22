@@ -1,3 +1,5 @@
+#!/usr/bin/env -S deno run --allow-net=api.github.com --allow-env=GITHUB_PAT,HOME --allow-read=/tmp --allow-write=/tmp --allow-run
+
 import { existsSync } from "node:fs";
 import {
 	MY_REPOS_SEARCH_PARAMS,
