@@ -92,7 +92,7 @@ async function updateRulesets(
 			ruleset_id: await ensureRuleset("tag", "Tags except versions"),
 			enforcement: "active",
 			conditions: {
-				ref_name: { include: ["~ALL"], exclude: ["refs/tags/v*.*.*"] },
+				ref_name: { include: ["~ALL"], exclude: ["refs/tags/v*"] },
 			},
 			rules: [
 				{ type: "creation" },
@@ -108,7 +108,7 @@ async function updateRulesets(
 			repo,
 			ruleset_id: await ensureRuleset("tag", "Version Tags"),
 			enforcement: "active",
-			conditions: { ref_name: { include: ["refs/tags/v*.*.*"], exclude: [] } },
+			conditions: { ref_name: { include: ["refs/tags/v*"], exclude: [] } },
 			bypass_actors: [
 				{
 					actor_id: 5, // Repository Admin
