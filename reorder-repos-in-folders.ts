@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --allow-net=api.github.com --allow-env=GITHUB_PAT,HOME --allow-run=project-below,git
+#!/usr/bin/env -S deno run --allow-net=api.github.com --allow-env=GITHUB_PAT,HOME --allow-read=${HOME}/git --allow-write=${HOME}/git --allow-run=project-below,git
 
 import { existsSync } from "node:fs";
 import {
