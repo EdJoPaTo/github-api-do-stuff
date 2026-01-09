@@ -26,7 +26,7 @@ async function getExpectedDirectory(localRepo: LocalRepo): Promise<string> {
 		const remoteRepoInfo = remoteRepos.find(
 			(r) => remoteUrl === r.ssh_url || remoteUrl === r.clone_url,
 		);
-		if (remoteRepoInfo) {
+		if (remoteRepoInfo && !remoteRepoInfo.fork) {
 			return getExpectedDirectoryOfGitHubRepo(remoteRepoInfo);
 		} else {
 			const splitted = localRepo.path.split("/");
@@ -37,7 +37,7 @@ async function getExpectedDirectory(localRepo: LocalRepo): Promise<string> {
 				{ owner, repo },
 			);
 
-			if (remoteUrl !== repoInfo.ssh_url) {
+			if (remoteUrl !== repoInfo.ssh_url && !repoInfo.fork) {
 				console.log("not in search result, remote is", repoInfo.ssh_url);
 			}
 

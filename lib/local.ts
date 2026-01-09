@@ -128,26 +128,40 @@ export type GithubRepoInfo = {
 	readonly name: string;
 	readonly owner: null | { readonly login: string };
 	readonly private: boolean;
+	readonly source?: {
+		readonly name: string;
+		readonly owner: { readonly login: string };
+	};
 };
 
 export function getExpectedDirectoryOfGitHubRepo(data: GithubRepoInfo): string {
+	if (data.fork && !data.source) {
+		console.log("Warning: fork but no source", data.name);
+	}
+
 	const owner = data.owner?.login ?? "other";
 
 	let folder = "";
 
 	if (data.is_template) {
 		folder = `template/${owner}`;
+	} else if (data.archived && data.fork) {
+		folder += ".archived-" + owner + "-fork";
 	} else {
 		if (data.archived) {
 			folder += ".archived-";
 		}
 
-		folder += owner;
-
-		if (data.fork) {
-			folder += "-fork";
+		if (data.source?.owner?.login && data.source.name === data.name) {
+			folder += data.source.owner.login;
+		} else if (data.fork) {
+			folder += owner + "-fork";
+		} else {
+			folder += owner;
 		}
+	}
 
+	if (!data.is_template) {
 		folder += "/";
 		folder += data.private ? "private" : "public";
 	}

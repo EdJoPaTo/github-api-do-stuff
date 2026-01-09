@@ -1,6 +1,10 @@
 #!/usr/bin/env -S deno run --allow-net=api.github.com --allow-env=GITHUB_PAT,HOME --allow-read=${HOME}/git --allow-run=git
 
-import { MY_REPOS_SEARCH_PARAMS, searchGithubRepos } from "./lib/github.ts";
+import {
+	MY_REPOS_SEARCH_PARAMS,
+	octokit,
+	searchGithubRepos,
+} from "./lib/github.ts";
 import { exec, getExpectedDirectoryOfGitHubRepo, HOME } from "./lib/local.ts";
 
 async function getRepos() {
@@ -8,7 +12,22 @@ async function getRepos() {
 		["fork:true", ...MY_REPOS_SEARCH_PARAMS].join(" "),
 	);
 	console.log("total repos", repos.length);
-	return repos;
+	return Promise.all(
+		repos.map(async (result) => {
+			if (result.fork) {
+				const { data: repoInfo } = await octokit.request(
+					"GET /repos/{owner}/{repo}",
+					{
+						owner: result.owner!.login,
+						repo: result.name,
+					},
+				);
+				return repoInfo;
+			} else {
+				return result;
+			}
+		}),
+	);
 }
 
 const allRepos = await getRepos();
