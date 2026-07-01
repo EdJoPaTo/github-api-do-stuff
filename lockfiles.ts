@@ -133,6 +133,7 @@ for (const repoInfo of repos) {
 			"clone",
 			"--depth=1",
 			"--no-single-branch",
+			"--quiet",
 			repoInfo.ssh_url,
 			tmpdir,
 		);
