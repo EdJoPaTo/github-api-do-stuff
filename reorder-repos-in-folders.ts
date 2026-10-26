@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run --allow-net=api.github.com --allow-env=GITHUB_PAT,HOME --allow-read=${HOME}/git --allow-write=${HOME}/git --allow-run=project-below,git
 
-import { existsSync } from "node:fs";
+import { existsSync, mkdirSync, renameSync } from "node:fs";
 import {
 	MY_REPOS_SEARCH_PARAMS,
 	octokit,
@@ -76,8 +76,8 @@ for (const entry of localRepos) {
 				expectedDir.replace(HOME, "~"),
 			);
 			const [parent] = splitDir(expectedDir);
-			Deno.mkdirSync(parent, { recursive: true });
-			Deno.renameSync(entry.dir, expectedDir);
+			mkdirSync(parent, { recursive: true });
+			renameSync(entry.dir, expectedDir);
 		}
 	} catch (error) {
 		console.error(

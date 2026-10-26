@@ -1,4 +1,10 @@
-export const HOME = Deno.env.get("HOME")!;
+import childProcess from "node:child_process";
+import { env } from "node:process";
+import util from "node:util";
+
+const execFile = util.promisify(childProcess.execFile);
+
+export const HOME = env["HOME"]!;
 if (!HOME) {
 	throw new Error("Your shell should set your HOME directory as env");
 }
@@ -13,18 +19,6 @@ const KNOWN_HOST_DIRS: Readonly<Record<string, string>> = {
 export function getBaseDirForGitHost(host: string): string {
 	const part = KNOWN_HOST_DIRS[host] ?? host;
 	return GIT_BASE_DIR + "/" + part;
-}
-
-export async function exec(cmd: string, ...args: string[]): Promise<string> {
-	const process = new Deno.Command(cmd, { args, stdout: "piped" }).spawn();
-	const status = await process.status;
-	if (!status.success) {
-		throw new Error(`Command ${cmd} was not successful`);
-	}
-
-	const { stdout: outputBuffer } = await process.output();
-	const output = new TextDecoder().decode(outputBuffer);
-	return output;
 }
 
 /// Split directory into parent folder and folder name
@@ -73,13 +67,16 @@ function matchRemote(remoteUrl: string): Remote | undefined {
 export async function getLocalRepos(): Promise<LocalRepo[]> {
 	const list: LocalRepo[] = [];
 
-	const fdOutput = await exec(
+	const { stdout: fdOutput } = await execFile(
 		"project-below",
-		"--hidden",
-		"--directory=.git",
-		"--base-dir=" + GIT_BASE_DIR,
-		"--canonical",
-		"--print0",
+		[
+			"--hidden",
+			"--directory=.git",
+			"--base-dir=" + GIT_BASE_DIR,
+			"--canonical",
+			"--print0",
+		],
+		{ encoding: "utf8" },
 	);
 	const directories = fdOutput
 		.split("\0")
@@ -89,7 +86,11 @@ export async function getLocalRepos(): Promise<LocalRepo[]> {
 	for (const dir of directories) {
 		const remotes: Record<string, Remote> = {};
 
-		const gitOutput = await exec("git", "-C", dir, "remote", "--verbose");
+		const { stdout: gitOutput } = await execFile(
+			"git",
+			["-C", dir, "remote", "--verbose"],
+			{ encoding: "utf8" },
+		);
 		const gitOutputLines = gitOutput.split("\n").filter((o) => o.trim() !== "");
 		for (const remoteLine of gitOutputLines) {
 			const remoteMatch = /(\w+)\t(\S+)/.exec(remoteLine);

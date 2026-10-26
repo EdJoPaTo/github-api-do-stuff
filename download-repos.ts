@@ -1,11 +1,13 @@
-#!/usr/bin/env -S deno run --allow-net=api.github.com --allow-env=GITHUB_PAT,HOME --allow-read=${HOME}/git --allow-run=git
+#!/usr/bin/env -S deno run --allow-net=api.github.com --allow-read=${HOME}/git --allow-env --allow-run=git
 
+import { spawnSync } from "node:child_process";
+import { existsSync } from "node:fs";
 import {
 	MY_REPOS_SEARCH_PARAMS,
 	octokit,
 	searchGithubRepos,
 } from "./lib/github.ts";
-import { exec, getExpectedDirectoryOfGitHubRepo, HOME } from "./lib/local.ts";
+import { getExpectedDirectoryOfGitHubRepo, HOME } from "./lib/local.ts";
 
 async function getRepos() {
 	const repos = await searchGithubRepos(
@@ -40,11 +42,9 @@ const jobs = allRepos
 
 for (const { localPath, repo } of jobs) {
 	console.log(localPath.replace(HOME, "~"));
-	try {
-		await Deno.stat(localPath);
-		// Path exists, probably fine
-	} catch {
-		// Path does not exist
-		console.log(await exec("git", "clone", repo.ssh_url, localPath));
+	if (!existsSync(localPath)) {
+		spawnSync("git", ["clone", repo.ssh_url, localPath], {
+			stdio: ["ignore", "inherit", "inherit"],
+		});
 	}
 }
