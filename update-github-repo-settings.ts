@@ -1,11 +1,8 @@
-#!/usr/bin/env -S deno run --allow-net=api.github.com --allow-env=GITHUB_PAT
+#!/usr/bin/env node
 
 import { arrayFilterUnique } from "array-filter-unique";
-import {
-	MY_REPOS_SEARCH_PARAMS,
-	octokit,
-	searchGithubRepos,
-} from "./lib/github.ts";
+
+import { MY_REPOS_SEARCH_PARAMS, octokit, searchGithubRepos } from "./lib/github.ts";
 import { logArray, logNonEmptyArray } from "./lib/log.ts";
 
 function isCheckWanted(name: string): boolean {
@@ -13,9 +10,7 @@ function isCheckWanted(name: string): boolean {
 	if (lower.includes("beta") || lower.includes("nightly")) {
 		return false;
 	}
-	return WANTED_CHECKS.some(
-		(wanted) => lower === wanted || lower.startsWith(wanted + " "),
-	);
+	return WANTED_CHECKS.some((wanted) => lower === wanted || lower.startsWith(wanted + " "));
 }
 
 // Do not add website-stalker. The git push doesnt work anymore then
@@ -35,18 +30,19 @@ const WANTED_CHECKS = [
 ] as const satisfies string[];
 
 async function removeBranchProtections(owner: string, repo: string) {
-	const branchesResponse = await octokit.request(
-		"GET /repos/{owner}/{repo}/branches",
-		{ owner, repo },
-	);
+	const branchesResponse = await octokit.request("GET /repos/{owner}/{repo}/branches", {
+		owner,
+		repo,
+	});
 	const protectedBranches = branchesResponse.data
 		.filter((o) => o.protection?.enabled)
 		.map((o) => o.name);
 	for (const branch of protectedBranches) {
-		await octokit.request(
-			"DELETE /repos/{owner}/{repo}/branches/{branch}/protection",
-			{ owner, repo, branch },
-		);
+		await octokit.request("DELETE /repos/{owner}/{repo}/branches/{branch}/protection", {
+			owner,
+			repo,
+			branch,
+		});
 	}
 }
 
@@ -57,21 +53,16 @@ async function updateRulesets(
 	ghaPushesToDefault: boolean,
 	relevantChecks: ReadonlyArray<Readonly<{ name: string; appId?: number }>>,
 ) {
-	const rulesetsResponse = await octokit.request(
-		"GET /repos/{owner}/{repo}/rulesets",
-		{ owner, repo },
-	);
+	const rulesetsResponse = await octokit.request("GET /repos/{owner}/{repo}/rulesets", {
+		owner,
+		repo,
+	});
 
-	async function ensureRuleset(
-		target: "branch" | "tag",
-		name: string,
-	): Promise<number> {
+	async function ensureRuleset(target: "branch" | "tag", name: string): Promise<number> {
 		let id = rulesetsResponse.data.find(
-			(rule) =>
-				rule.source_type === "Repository" &&
-				rule.target === target &&
-				rule.name === name,
+			(rule) => rule.source_type === "Repository" && rule.target === target && rule.name === name,
 		)?.id;
+		// oxlint-disable-next-line strict-boolean-expressions
 		if (!id) {
 			const bla = await octokit.request("POST /repos/{owner}/{repo}/rulesets", {
 				owner,
@@ -171,29 +162,17 @@ async function updateRulesets(
 			],
 		});
 	} catch (err) {
-		console.error(
-			"update default branch ruleset error",
-			err instanceof Error ? err.message : err,
-		);
+		console.error("update default branch ruleset error", err instanceof Error ? err.message : err);
 	}
 }
 
-async function doRepo(
-	owner: string,
-	repo: string,
-	privateRepo: boolean,
-	defaultBranch: string,
-) {
+async function doRepo(owner: string, repo: string, privateRepo: boolean, defaultBranch: string) {
 	console.log("\ndo repo", owner, repo);
 
 	await Promise.all([
 		removeBranchProtections(owner, repo),
 
-		octokit.request("PUT /repos/{owner}/{repo}/subscription", {
-			owner,
-			repo,
-			subscribed: true,
-		}),
+		octokit.request("PUT /repos/{owner}/{repo}/subscription", { owner, repo, subscribed: true }),
 
 		octokit.request("PATCH /repos/{owner}/{repo}", {
 			owner,
@@ -222,21 +201,19 @@ async function doRepo(
 		}),
 	]);
 
-	await octokit.request(
-		"PUT /repos/{owner}/{repo}/actions/permissions/workflow",
-		{
-			owner,
-			repo,
-			can_approve_pull_request_reviews: false,
-			default_workflow_permissions: "read",
-		},
-	);
+	await octokit.request("PUT /repos/{owner}/{repo}/actions/permissions/workflow", {
+		owner,
+		repo,
+		can_approve_pull_request_reviews: false,
+		default_workflow_permissions: "read",
+	});
 
 	if (privateRepo) {
-		await octokit.request(
-			"PUT /repos/{owner}/{repo}/actions/permissions/access",
-			{ owner, repo, access_level: "none" },
-		);
+		await octokit.request("PUT /repos/{owner}/{repo}/actions/permissions/access", {
+			owner,
+			repo,
+			access_level: "none",
+		});
 	} else {
 		await octokit.request(
 			"PUT /repos/{owner}/{repo}/actions/permissions/fork-pr-contributor-approval",
@@ -261,26 +238,15 @@ async function doRepo(
 		.filter((check) => check.app?.id !== 29110) // Dependabot
 		.map((check) => ({ appId: check.app?.id, name: check.name }))
 		.filter(arrayFilterUnique((check) => `${check.appId} ${check.name}`))
-		.sort((a, b) => a.name.localeCompare(b.name));
-	const ghaPushesToDefault = allChecks.some(
-		(check) => check.name === "website-stalker",
-	);
+		.toSorted((a, b) => a.name.localeCompare(b.name));
+	const ghaPushesToDefault = allChecks.some((check) => check.name === "website-stalker");
 	const relevantChecks = allChecks.filter((check) => isCheckWanted(check.name));
 	// logNonEmptyArray("relevant checks", relevantChecks);
 
-	console.log(
-		"ratelimit-remaining",
-		checksResponse.headers["x-ratelimit-remaining"],
-	);
+	console.log("ratelimit-remaining", checksResponse.headers["x-ratelimit-remaining"]);
 
 	if (!privateRepo) {
-		await updateRulesets(
-			owner,
-			repo,
-			noChecks,
-			ghaPushesToDefault,
-			relevantChecks,
-		);
+		await updateRulesets(owner, repo, noChecks, ghaPushesToDefault, relevantChecks);
 	}
 
 	return allChecks.map((check) => check.name);
@@ -293,19 +259,12 @@ console.log("total repos", repos.length);
 
 let allChecks: string[] = [];
 for (const repo of repos) {
-	const result = await doRepo(
-		repo.owner!.login,
-		repo.name,
-		repo.private,
-		repo.default_branch,
-	);
+	const result = await doRepo(repo.owner!.login, repo.name, repo.private, repo.default_branch);
 	allChecks.push(...(result ?? []));
 }
 
 console.log("\n\nall done");
-allChecks = allChecks
-	.filter(arrayFilterUnique())
-	.sort((a, b) => a.localeCompare(b));
+allChecks = allChecks.filter(arrayFilterUnique()).toSorted((a, b) => a.localeCompare(b));
 const unusedWantedChecks = [...WANTED_CHECKS].filter(
 	(wanted) => !allChecks.some((check) => check.toLowerCase().includes(wanted)),
 );

@@ -1,26 +1,14 @@
-#!/usr/bin/env -S deno run --allow-net=api.github.com --allow-env=GITHUB_PAT
+#!/usr/bin/env node
 
-import {
-	MY_REPOS_SEARCH_PARAMS,
-	octokit,
-	searchGithubRepos,
-} from "./lib/github.ts";
+import { MY_REPOS_SEARCH_PARAMS, octokit, searchGithubRepos } from "./lib/github.ts";
 import { logNonEmptyArray } from "./lib/log.ts";
 
 async function doRepo(owner: string, repo: string) {
 	console.log("\ndo repo", owner, repo);
 
 	const [workflowsResponse, runsReponse] = await Promise.all([
-		octokit.request("GET /repos/{owner}/{repo}/actions/workflows", {
-			owner,
-			repo,
-			per_page: 100,
-		}),
-		octokit.request("GET /repos/{owner}/{repo}/actions/runs", {
-			owner,
-			repo,
-			per_page: 100,
-		}),
+		octokit.request("GET /repos/{owner}/{repo}/actions/workflows", { owner, repo, per_page: 100 }),
+		octokit.request("GET /repos/{owner}/{repo}/actions/runs", { owner, repo, per_page: 100 }),
 	]);
 
 	const { workflows } = workflowsResponse.data;
@@ -54,9 +42,7 @@ console.log("total repos", repos.length);
 
 logNonEmptyArray(
 	"not main",
-	repos
-		.filter((o) => o.default_branch !== "main")
-		.map((o) => `${o.default_branch} ${o.html_url}`),
+	repos.filter((o) => o.default_branch !== "main").map((o) => `${o.default_branch} ${o.html_url}`),
 );
 
 logNonEmptyArray(

@@ -2,6 +2,8 @@ import childProcess from "node:child_process";
 import { env } from "node:process";
 import util from "node:util";
 
+// false positive? lint warning seems odd
+// oxlint-disable-next-line strict-void-return
 const execFile = util.promisify(childProcess.execFile);
 
 export const HOME = env["HOME"]!;
@@ -29,24 +31,24 @@ export function splitDir(dir: string): [string, string] {
 	return [splitted.join("/"), last];
 }
 
-export type LocalRepo = {
+export interface LocalRepo {
 	readonly dir: string;
 	readonly remoteUrl: string;
 	readonly host: string;
 	readonly path: string;
-};
+}
 
-type Remote = {
+interface Remote {
 	readonly remoteUrl: string;
 	readonly host: string;
 	readonly path: string;
-};
+}
 
 function matchRemote(remoteUrl: string): Remote | undefined {
-	const sshMatch = /^git@([^:]+):(.+)$/.exec(remoteUrl);
+	const sshMatch = /^git@([^:]+):(.+)$/u.exec(remoteUrl);
 	if (sshMatch) {
 		const host = sshMatch[1]!;
-		const path = sshMatch[2]!.replace(/\.git$/, "");
+		const path = sshMatch[2]!.replace(/\.git$/u, "");
 		return { remoteUrl, host, path };
 	}
 
@@ -57,7 +59,7 @@ function matchRemote(remoteUrl: string): Remote | undefined {
 			.split("/")
 			.filter(Boolean)
 			.join("/")
-			.replace(/\.git$/, "");
+			.replace(/\.git$/u, "");
 		return { remoteUrl, host, path };
 	}
 
@@ -69,31 +71,23 @@ export async function getLocalRepos(): Promise<LocalRepo[]> {
 
 	const { stdout: fdOutput } = await execFile(
 		"project-below",
-		[
-			"--hidden",
-			"--directory=.git",
-			"--base-dir=" + GIT_BASE_DIR,
-			"--canonical",
-			"--print0",
-		],
+		["--hidden", "--directory=.git", "--base-dir=" + GIT_BASE_DIR, "--canonical", "--print0"],
 		{ encoding: "utf8" },
 	);
 	const directories = fdOutput
 		.split("\0")
 		.map((o) => o.trim())
 		.filter(Boolean)
-		.sort();
+		.toSorted();
 	for (const dir of directories) {
 		const remotes: Record<string, Remote> = {};
 
-		const { stdout: gitOutput } = await execFile(
-			"git",
-			["-C", dir, "remote", "--verbose"],
-			{ encoding: "utf8" },
-		);
+		const { stdout: gitOutput } = await execFile("git", ["-C", dir, "remote", "--verbose"], {
+			encoding: "utf8",
+		});
 		const gitOutputLines = gitOutput.split("\n").filter((o) => o.trim() !== "");
 		for (const remoteLine of gitOutputLines) {
-			const remoteMatch = /(\w+)\t(\S+)/.exec(remoteLine);
+			const remoteMatch = /(\w+)\t(\S+)/u.exec(remoteLine);
 			if (!remoteMatch) {
 				throw new Error("unknown git remote line: " + remoteLine);
 			}
@@ -101,12 +95,11 @@ export async function getLocalRepos(): Promise<LocalRepo[]> {
 			const name = remoteMatch[1]!;
 			const url = remoteMatch[2]!;
 			const info = matchRemote(url);
-			if (!info) {
+			if (info) {
+				remotes[name] = info;
+			} else {
 				console.log("skip not parsable", dir.replace(HOME, "~"), remoteLine);
-				continue;
 			}
-
-			remotes[name] = info;
 		}
 
 		const relevant = remotes["upstream"] ?? remotes["origin"];
@@ -122,7 +115,7 @@ export async function getLocalRepos(): Promise<LocalRepo[]> {
 	return list;
 }
 
-export type GithubRepoInfo = {
+export interface GithubRepoInfo {
 	readonly archived: boolean;
 	readonly fork: boolean;
 	readonly is_template?: boolean;
@@ -133,7 +126,7 @@ export type GithubRepoInfo = {
 		readonly name: string;
 		readonly owner: { readonly login: string };
 	};
-};
+}
 
 export function getExpectedDirectoryOfGitHubRepo(data: GithubRepoInfo): string {
 	if (data.fork && !data.source) {

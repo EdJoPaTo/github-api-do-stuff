@@ -1,44 +1,33 @@
-#!/usr/bin/env -S deno run --allow-net=api.github.com --allow-read=${HOME}/git --allow-env --allow-run=git
+#!/usr/bin/env node
 
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
-import {
-	MY_REPOS_SEARCH_PARAMS,
-	octokit,
-	searchGithubRepos,
-} from "./lib/github.ts";
+
+import { MY_REPOS_SEARCH_PARAMS, octokit, searchGithubRepos } from "./lib/github.ts";
 import { getExpectedDirectoryOfGitHubRepo, HOME } from "./lib/local.ts";
 
 async function getRepos() {
-	const repos = await searchGithubRepos(
-		["fork:true", ...MY_REPOS_SEARCH_PARAMS].join(" "),
-	);
+	const repos = await searchGithubRepos(["fork:true", ...MY_REPOS_SEARCH_PARAMS].join(" "));
 	console.log("total repos", repos.length);
 	return Promise.all(
 		repos.map(async (result) => {
 			if (result.fork) {
-				const { data: repoInfo } = await octokit.request(
-					"GET /repos/{owner}/{repo}",
-					{
-						owner: result.owner!.login,
-						repo: result.name,
-					},
-				);
+				const { data: repoInfo } = await octokit.request("GET /repos/{owner}/{repo}", {
+					owner: result.owner!.login,
+					repo: result.name,
+				});
 				return repoInfo;
-			} else {
-				return result;
 			}
+
+			return result;
 		}),
 	);
 }
 
 const allRepos = await getRepos();
 const jobs = allRepos
-	.map((repo) => ({
-		localPath: getExpectedDirectoryOfGitHubRepo(repo),
-		repo,
-	}))
-	.sort((a, b) => a.localPath.localeCompare(b.localPath));
+	.map((repo) => ({ repo, localPath: getExpectedDirectoryOfGitHubRepo(repo) }))
+	.toSorted((a, b) => a.localPath.localeCompare(b.localPath));
 
 for (const { localPath, repo } of jobs) {
 	console.log(localPath.replace(HOME, "~"));

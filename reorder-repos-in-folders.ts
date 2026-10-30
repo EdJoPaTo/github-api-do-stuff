@@ -1,11 +1,8 @@
-#!/usr/bin/env -S deno run --allow-net=api.github.com --allow-env=GITHUB_PAT,HOME --allow-read=${HOME}/git --allow-write=${HOME}/git --allow-run=project-below,git
+#!/usr/bin/env node
 
 import { existsSync, mkdirSync, renameSync } from "node:fs";
-import {
-	MY_REPOS_SEARCH_PARAMS,
-	octokit,
-	searchGithubRepos,
-} from "./lib/github.ts";
+
+import { MY_REPOS_SEARCH_PARAMS, octokit, searchGithubRepos } from "./lib/github.ts";
 import {
 	getBaseDirForGitHost,
 	getExpectedDirectoryOfGitHubRepo,
@@ -28,21 +25,18 @@ async function getExpectedDirectory(localRepo: LocalRepo): Promise<string> {
 		);
 		if (remoteRepoInfo && !remoteRepoInfo.fork) {
 			return getExpectedDirectoryOfGitHubRepo(remoteRepoInfo);
-		} else {
-			const splitted = localRepo.path.split("/");
-			const owner = splitted[0]!;
-			const repo = splitted[1]!;
-			const { data: repoInfo } = await octokit.request(
-				"GET /repos/{owner}/{repo}",
-				{ owner, repo },
-			);
-
-			if (remoteUrl !== repoInfo.ssh_url && !repoInfo.fork) {
-				console.log("not in search result, remote is", repoInfo.ssh_url);
-			}
-
-			return getExpectedDirectoryOfGitHubRepo(repoInfo);
 		}
+
+		const splitted = localRepo.path.split("/");
+		const owner = splitted[0]!;
+		const repo = splitted[1]!;
+		const { data: repoInfo } = await octokit.request("GET /repos/{owner}/{repo}", { owner, repo });
+
+		if (remoteUrl !== repoInfo.ssh_url && !repoInfo.fork) {
+			console.log("not in search result, remote is", repoInfo.ssh_url);
+		}
+
+		return getExpectedDirectoryOfGitHubRepo(repoInfo);
 	}
 
 	const baseDir = getBaseDirForGitHost(localRepo.host);
@@ -62,19 +56,9 @@ for (const entry of localRepos) {
 		if (entry.dir === expectedDir) {
 			// console.log("correct", fullPath.replace(HOME, "~"));
 		} else if (existsSync(expectedDir)) {
-			console.log(
-				"duplica",
-				entry.dir.replace(HOME, "~"),
-				"→",
-				expectedDir.replace(HOME, "~"),
-			);
+			console.log("duplica", entry.dir.replace(HOME, "~"), "→", expectedDir.replace(HOME, "~"));
 		} else {
-			console.log(
-				"rename ",
-				entry.dir.replace(HOME, "~"),
-				"→",
-				expectedDir.replace(HOME, "~"),
-			);
+			console.log("rename ", entry.dir.replace(HOME, "~"), "→", expectedDir.replace(HOME, "~"));
 			const [parent] = splitDir(expectedDir);
 			mkdirSync(parent, { recursive: true });
 			renameSync(entry.dir, expectedDir);

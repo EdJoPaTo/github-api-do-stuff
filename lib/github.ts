@@ -1,4 +1,5 @@
 import { env } from "node:process";
+
 import { Octokit } from "@octokit/core";
 import type { Endpoints } from "@octokit/types";
 
@@ -20,12 +21,10 @@ export const octokit = new Octokit({ auth: GITHUB_PAT });
 export type GithubSearchRepoInfo =
 	Endpoints["GET /search/repositories"]["response"]["data"]["items"][0];
 
-export async function searchGithubRepos(
-	query: string,
-): Promise<GithubSearchRepoInfo[]> {
+export async function searchGithubRepos(query: string): Promise<GithubSearchRepoInfo[]> {
 	const repos: GithubSearchRepoInfo[] = [];
 
-	for (let page = 1;; page++) {
+	for (let page = 1; ; page++) {
 		const response = await octokit.request("GET /search/repositories", {
 			per_page: 100,
 			sort: "updated",
